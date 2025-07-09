@@ -2,7 +2,6 @@ import { html, render } from "lit-html";
 import OpenAI from "openai";
 import { concatMap, debounceTime, distinctUntilChanged, from, fromEvent, map, merge, Subject, switchMap, tap } from "rxjs";
 import type { ApiKey } from "./api-key";
-import { decodeBytes } from "./decode-bytes";
 import { probToHex } from "./prob-to-hex";
 
 export class CompletionDemo {
@@ -168,6 +167,11 @@ export class ChatDemo {
       }
     });
 
+    const inputState = {
+      initial: "",
+      parts: [] as { type: "text" | "bytes"; value: string }[],
+    };
+
     fromEvent(props.threadInput, "input")
       .pipe(
         tap(() => render(null, props.optionContainer)) // Clear options on input change
@@ -192,6 +196,9 @@ export class ChatDemo {
             apiKey: props.apiKey.getApiKey(),
           });
 
+          inputState.initial = props.threadInput.value;
+          inputState.parts = []; // Reset bytes state
+
           render(null, props.optionContainer); // Clear previous options
 
           const response = await openai.completions.create(
@@ -209,9 +216,12 @@ export class ChatDemo {
           console.log("Response:", response);
 
           const options = response.choices[0].logprobs?.top_logprobs ?? [];
+          const selectedTokens = response.choices[0].logprobs?.tokens ?? [];
           const tokenStream = options.map((option) =>
             Object.entries(option).map(([key, value]) => ({
-              token: key.startsWith("bytes:") ? decodeBytes(key) : key,
+              value: key.startsWith("bytes:") ? key.slice(6) : key,
+              type: key.startsWith("bytes:") ? "bytes" : "text",
+              isSelected: selectedTokens.includes(key),
               probability: value,
             }))
           );
@@ -224,7 +234,7 @@ export class ChatDemo {
               ${options.map((o) => {
                 const { background, text } = probToHex(o.probability);
                 return html`<button class="token-option" style="background-color: ${background}; color: ${text};">
-                  <code>${JSON.stringify(o.token).slice(1, -1)}</code>
+                  <code>${JSON.stringify(o.value).slice(1, -1)}</code>
                 </button>`;
               })}
             `,
@@ -232,9 +242,43 @@ export class ChatDemo {
           );
 
           await new Promise((resolve) => setTimeout(resolve, 100)); // Simulate delay for next token
-          props.threadInput.value += options[0].token; // Append the first token to the input
+          const selectedToken = options.find((o) => o.isSelected)!;
+          const currentType = selectedToken.type as "text" | "bytes";
+          if (inputState.parts.at(-1)?.type === currentType) {
+            inputState.parts.at(-1)!.value += selectedToken.value; // Append to last part
+          } else {
+            inputState.parts.push({ type: currentType, value: selectedToken.value }); // Start new part
+          }
+          const decoded = inputState.parts.map((part) => (part.type === "bytes" ? decodeBytes(part.value) : part.value)).join("");
+          props.threadInput.value = `${inputState.initial}${decoded}`;
         })
       )
       .subscribe();
+  }
+}
+
+function decodeBytes(input: string) {
+  try {
+    // Remove "bytes:" prefix
+    const hexString = input.replace(/^bytes:/, "");
+
+    // Extract ALL hex bytes in sequence
+    const hexMatches = hexString.match(/\\x([0-9a-fA-F]{2})/g);
+
+    if (!hexMatches || hexMatches.length === 0) {
+      return input;
+    }
+
+    // Convert all hex values to bytes
+    const bytes = hexMatches.map((hex) => parseInt(hex.replace("\\x", ""), 16));
+
+    // Let TextDecoder handle the variable-length UTF-8 sequences
+    const byteArray = new Uint8Array(bytes);
+    const decoder = new TextDecoder("utf-8", { fatal: false });
+
+    return decoder.decode(byteArray);
+  } catch (error) {
+    console.error("Error converting bytes to Unicode:", error);
+    return input;
   }
 }
