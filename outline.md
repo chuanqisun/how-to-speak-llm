@@ -1,0 +1,5 @@
+- Completion
+- Chat
+- Tool use
+- ReAct
+- Agent
