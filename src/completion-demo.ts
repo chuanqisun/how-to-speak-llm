@@ -1,6 +1,6 @@
 import { html, render } from "lit-html";
 import OpenAI from "openai";
-import { concatMap, debounceTime, distinctUntilChanged, from, fromEvent, map, merge, Subject, switchMap, tap } from "rxjs";
+import { concatMap, debounceTime, distinctUntilChanged, filter, from, fromEvent, map, merge, mergeWith, Subject, switchMap, tap } from "rxjs";
 import type { ApiKey } from "./api-key";
 import { probToHex } from "./prob-to-hex";
 
@@ -157,6 +157,11 @@ export class ChatDemo {
   constructor(props: { messageInput: HTMLInputElement; threadInput: HTMLInputElement; optionContainer: HTMLElement; apiKey: ApiKey }) {
     const submit$ = new Subject<string>();
 
+    const forceSubmit$ = fromEvent<KeyboardEvent>(props.threadInput, "keydown").pipe(
+      filter((e) => e.key === "Enter" && (e.ctrlKey || e.metaKey)),
+      map(() => props.threadInput.value)
+    );
+
     props.messageInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
@@ -186,6 +191,7 @@ export class ChatDemo {
         map(() => props.threadInput.value ?? ""),
         debounceTime(200),
         distinctUntilChanged(),
+        mergeWith(forceSubmit$),
         switchMap(async (prompt) => {
           if (!prompt.trim()) return [];
 
