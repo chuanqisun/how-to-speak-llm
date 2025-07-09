@@ -11,23 +11,113 @@
     <input id="openaiApiKey" name="openaiApiKey" type="password" class="inline-input" data-1p-ignore />
     <br />
     <br />
-    <label for="completionInput">Next token</label>
-    <textarea id="completionInput" name="nextTokenInput" type="text" class="block-input"></textarea>
+
+    <details>
+      <summary>1. Next token</summary>
+      <div class="details">
+        <label for="completionInput">Input</label>
+        <textarea id="completionInput" name="nextTokenInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
+        <div id="completionOutput" class="option-list"></div>
+      </div>
+    </details>
+
     <br />
-    <div id="completionOutput" class="option-list"></div>
+
+    <details>
+      <summary>2. Completion</summary>
+      <div class="details">
+        <label for="multitokenInput">Input</label>
+        <textarea id="multitokenInput" name="multitokenInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
+        <br />
+        <div id="multitokenOutput" class="option-list"></div>
+      </div>
+    </details>
+
     <br />
-    <label for="multitokenInput">Completion</label>
-    <textarea id="multitokenInput" name="multitokenInput" type="text" class="block-input"></textarea>
+
+    <details>
+      <summary>3. Chat</summary>
+      <div class="details">
+        <label for="messageInput">User message</label>
+        <textarea id="messageInput" name="messageInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
+        <label for="threadInput">Thread</label>
+        <textarea id="threadInput" name="threadInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
+        <br />
+        <div id="threadOutput" class="option-list"></div>
+      </div>
+    </details>
+
     <br />
-    <div id="multitokenOutput" class="option-list"></div>
+
+    <details>
+      <summary>4. Chain of Thought</summary>
+      <div class="details">
+        <label for="cotMessageInput">User message</label>
+        <textarea id="cotMessageInput" name="cotMessageInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
+        <br />
+        <label for="cotInput">CoT</label>
+        <textarea id="cotInput" name="cotInput" type="text" class="block-input">
+Below is a transcript of user interacting with an Assistant. The assistant responded with its internal monologue thinking and final response in one turn. In this format
+
+"""
+[User]
+...
+
+[Assistant]
+thought: ...
+thought: ...
+...
+final response: ...
+"""</textarea
+        >
+        <br />
+        <div id="cotOutput" class="option-list"></div>
+      </div>
+    </details>
+
     <br />
-    <label for="messageInput">User message</label>
-    <textarea id="messageInput" name="messageInput" type="text" class="block-input"></textarea>
-    <label for="threadInput">Thread</label>
-    <textarea id="threadInput" name="threadInput" type="text" class="block-input"></textarea>
-    <br />
-    <div id="threadOutput" class="option-list"></div>
-    <br />
+
+    <details>
+      <summary>5. Agent</summary>
+      <div class="details">
+        <label for="reActMessageInput">User message</label>
+        <textarea id="reActMessageInput" name="reActMessageInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
+        <br />
+        <label for="reActInput">Thread</label>
+        <textarea id="reActInput" name="reActInput" type="text" class="block-input" autocomplete="off" spellcheck="false">
+Below is a transcript of user interacting with an Assistant. The assistant reasons about its plan, uses tool to interact with the environment, makes observation about tools output
+After sufficient tool use, the assisant provides a final response. The assistant can only use the following tools:
+
+"get_weather(city)" - returns the weather in the given city
+"web_search(query)" - returns the top 3 search results for the given query
+
+
+The transcript format:
+
+"""
+[User]
+...
+
+[Assistant]
+thought: ...
+tool_use: tool_name(args)
+tool_output: ...
+observation: ...
+
+thought: ...
+tool_use: tool_name(args)
+tool_output: ...
+observation: ...
+
+...
+
+final response: ...
+"""</textarea
+        >
+        <br />
+        <div id="reActOutput" class="option-list"></div>
+      </div>
+    </details>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

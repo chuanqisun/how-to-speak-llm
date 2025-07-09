@@ -1,5 +1,6 @@
 - Completion
 - Chat
 - Tool use
+- RAG
 - ReAct
 - Agent

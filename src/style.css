@@ -50,3 +50,10 @@ label {
   flex-wrap: wrap;
   gap: 1ch;
 }
+
+.details {
+  border: 4px double #aaa;
+  margin-top: 1ch;
+  padding: 1ch;
+  /* padding: 1ch 0 1ch calc(1ch + 0.4rem); */
+}

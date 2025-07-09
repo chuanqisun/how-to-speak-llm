@@ -21,4 +21,21 @@ new ChatDemo({
   messageInput: document.querySelector("#messageInput") as HTMLInputElement,
   optionContainer: document.querySelector("#threadOutput") as HTMLElement,
   apiKey,
+  stop: ["[User]"],
+});
+
+new ChatDemo({
+  threadInput: document.querySelector("#cotInput") as HTMLInputElement,
+  messageInput: document.querySelector("#cotMessageInput") as HTMLInputElement,
+  optionContainer: document.querySelector("#cotOutput") as HTMLElement,
+  apiKey,
+  stop: ["[User]"],
+});
+
+new ChatDemo({
+  threadInput: document.querySelector("#reActInput") as HTMLInputElement,
+  messageInput: document.querySelector("#reActMessageInput") as HTMLInputElement,
+  optionContainer: document.querySelector("#reActOutput") as HTMLElement,
+  apiKey,
+  stop: ["[User]", "tool_output"],
 });

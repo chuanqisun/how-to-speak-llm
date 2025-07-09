@@ -154,7 +154,14 @@ export class MultiTokenDemo {
 export class ChatDemo {
   private ac?: AbortController;
 
-  constructor(props: { messageInput: HTMLInputElement; threadInput: HTMLInputElement; optionContainer: HTMLElement; apiKey: ApiKey }) {
+  constructor(props: {
+    messageInput: HTMLInputElement;
+    threadInput: HTMLInputElement;
+    optionContainer: HTMLElement;
+    apiKey: ApiKey;
+    allowEmoji?: boolean;
+    stop?: string[];
+  }) {
     const submit$ = new Subject<string>();
 
     const forceSubmit$ = fromEvent<KeyboardEvent>(props.threadInput, "keydown").pipe(
@@ -211,10 +218,10 @@ export class ChatDemo {
             {
               model: "gpt-3.5-turbo-instruct",
               prompt,
-              max_tokens: 32,
+              max_tokens: 120,
               temperature: 0,
               logprobs: 5,
-              stop: ["[User]"],
+              stop: props.stop,
             },
             { signal: this.ac.signal }
           );
@@ -255,8 +262,13 @@ export class ChatDemo {
           } else {
             inputState.parts.push({ type: currentType, value: selectedToken.value }); // Start new part
           }
-          const decoded = inputState.parts.map((part) => (part.type === "bytes" ? decodeBytes(part.value) : part.value)).join("");
-          props.threadInput.value = `${inputState.initial}${decoded}`;
+
+          if (props.allowEmoji) {
+            const decoded = inputState.parts.map((part) => (part.type === "bytes" ? decodeBytes(part.value) : part.value)).join("");
+            props.threadInput.value = `${inputState.initial}${decoded}`;
+          } else {
+            props.threadInput.value += selectedToken.value;
+          }
         })
       )
       .subscribe();
