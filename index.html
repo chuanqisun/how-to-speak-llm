@@ -7,9 +7,27 @@
     <title>Vite + TS</title>
   </head>
   <body>
-    <label>OpenAI API Key [<input id="openaiApiKey" name="openaiApiKey" type="password" class="inline-input" data-1p-ignore />] </label>
+    <label for="openaiApiKey">OpenAI API Key</label>
+    <input id="openaiApiKey" name="openaiApiKey" type="password" class="inline-input" data-1p-ignore />
     <br />
-    <label>Input [<input id="input" name="input" type="text" class="inline-input" />]</label>
+    <br />
+    <label for="completionInput">Next token</label>
+    <textarea id="completionInput" name="nextTokenInput" type="text" class="block-input"></textarea>
+    <br />
+    <div id="completionOutput" class="option-list"></div>
+    <br />
+    <label for="multitokenInput">Completion</label>
+    <textarea id="multitokenInput" name="multitokenInput" type="text" class="block-input"></textarea>
+    <br />
+    <div id="multitokenOutput" class="option-list"></div>
+    <br />
+    <label for="messageInput">User message</label>
+    <textarea id="messageInput" name="messageInput" type="text" class="block-input"></textarea>
+    <label for="threadInput">Thread</label>
+    <textarea id="threadInput" name="threadInput" type="text" class="block-input"></textarea>
+    <br />
+    <div id="threadOutput" class="option-list"></div>
+    <br />
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

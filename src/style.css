@@ -14,7 +14,39 @@ input::-ms-clear {
 }
 
 .inline-input {
+  padding: 1ch;
   outline: none;
   border: none;
   field-sizing: content;
+  max-width: 40ch;
+  background-color: #eee;
+}
+
+.block-input {
+  padding: 1ch;
+  outline: none;
+  border: none;
+  field-sizing: content;
+  width: 100%;
+  resize: none;
+  background-color: #eee;
+}
+
+.token-option {
+  border: none;
+  box-shadow: none;
+
+  code {
+    white-space: pre-wrap;
+  }
+}
+
+label {
+  display: block;
+}
+
+.option-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1ch;
 }

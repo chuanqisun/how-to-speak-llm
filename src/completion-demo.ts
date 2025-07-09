@@ -1,0 +1,240 @@
+import { html, render } from "lit-html";
+import OpenAI from "openai";
+import { concatMap, debounceTime, distinctUntilChanged, from, fromEvent, map, merge, Subject, switchMap, tap } from "rxjs";
+import type { ApiKey } from "./api-key";
+import { decodeBytes } from "./decode-bytes";
+import { probToHex } from "./prob-to-hex";
+
+export class CompletionDemo {
+  private ac?: AbortController;
+
+  constructor(props: { input: HTMLInputElement; optionContainer: HTMLElement; apiKey: ApiKey }) {
+    const input$ = fromEvent(props.input, "input");
+    const append$ = new Subject<void>();
+
+    merge(input$, append$)
+      .pipe(
+        map(() => props.input.value ?? ""),
+        debounceTime(200),
+        distinctUntilChanged(),
+        switchMap(async (prompt) => {
+          if (!prompt.trim()) return [];
+
+          this.ac?.abort(); // Abort previous request if any
+          this.ac = new AbortController();
+          const openai = new OpenAI({
+            dangerouslyAllowBrowser: true,
+            apiKey: props.apiKey.getApiKey(),
+          });
+
+          render(null, props.optionContainer); // Clear previous options
+
+          const response = await openai.completions.create(
+            {
+              model: "gpt-3.5-turbo-instruct",
+              prompt,
+              max_tokens: 1,
+              temperature: 0,
+              logprobs: 5,
+            },
+            { signal: this.ac.signal }
+          );
+
+          const options = (response.choices[0].logprobs?.top_logprobs ?? []).at(0) ?? {};
+          return Object.entries(options).map(([key, value]) => ({
+            token: key,
+            probability: value,
+          }));
+        }),
+        tap((options) => {
+          render(
+            html`
+              ${options.map((o) => {
+                const { background, text } = probToHex(o.probability);
+                return html`<button
+                  class="token-option"
+                  style="background-color: ${background}; color: ${text};"
+                  @click=${() => {
+                    props.input.value += o.token;
+                    append$.next();
+                    props.input.focus();
+                  }}
+                >
+                  <code>${JSON.stringify(o.token).slice(1, -1)}</code>
+                </button>`;
+              })}
+            `,
+            props.optionContainer
+          );
+        })
+      )
+      .subscribe();
+  }
+}
+
+export class MultiTokenDemo {
+  private ac?: AbortController;
+
+  constructor(props: { input: HTMLInputElement; optionContainer: HTMLElement; apiKey: ApiKey }) {
+    const submit$ = new Subject<void>();
+
+    props.input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        submit$.next();
+      }
+    });
+
+    fromEvent(props.input, "input")
+      .pipe(
+        tap(() => render(null, props.optionContainer)) // Clear options on input change
+      )
+      .subscribe();
+
+    merge(submit$)
+      .pipe(
+        map(() => props.input.value ?? ""),
+        debounceTime(200),
+        distinctUntilChanged(),
+        switchMap(async (prompt) => {
+          if (!prompt.trim()) return [];
+
+          this.ac?.abort(); // Abort previous request if any
+          this.ac = new AbortController();
+          const openai = new OpenAI({
+            dangerouslyAllowBrowser: true,
+            apiKey: props.apiKey.getApiKey(),
+          });
+
+          render(null, props.optionContainer); // Clear previous options
+
+          const response = await openai.completions.create(
+            {
+              model: "gpt-3.5-turbo-instruct",
+              prompt,
+              max_tokens: 32,
+              temperature: 0,
+              logprobs: 5,
+            },
+            { signal: this.ac.signal }
+          );
+
+          console.log("Response:", response);
+
+          const options = response.choices[0].logprobs?.top_logprobs ?? [];
+          const tokenStream = options.map((option) =>
+            Object.entries(option).map(([key, value]) => ({
+              token: key,
+              probability: value,
+            }))
+          );
+          return tokenStream;
+        }),
+        switchMap((tokenStream) => from(tokenStream)),
+        concatMap(async (options) => {
+          render(
+            html`
+              ${options.map((o) => {
+                const { background, text } = probToHex(o.probability);
+                return html`<button class="token-option" style="background-color: ${background}; color: ${text};">
+                  <code>${JSON.stringify(o.token).slice(1, -1)}</code>
+                </button>`;
+              })}
+            `,
+            props.optionContainer
+          );
+
+          await new Promise((resolve) => setTimeout(resolve, 100)); // Simulate delay for next token
+          props.input.value += options[0].token; // Append the first token to the input
+        })
+      )
+      .subscribe();
+  }
+}
+
+export class ChatDemo {
+  private ac?: AbortController;
+
+  constructor(props: { messageInput: HTMLInputElement; threadInput: HTMLInputElement; optionContainer: HTMLElement; apiKey: ApiKey }) {
+    const submit$ = new Subject<string>();
+
+    props.messageInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        const trimmed = props.messageInput.value.trim();
+        if (!trimmed) return;
+        submit$.next(trimmed);
+        props.messageInput.value = ""; // Clear message input after submission
+      }
+    });
+
+    fromEvent(props.threadInput, "input")
+      .pipe(
+        tap(() => render(null, props.optionContainer)) // Clear options on input change
+      )
+      .subscribe();
+
+    merge(submit$)
+      .pipe(
+        tap(
+          (message) => (props.threadInput.value = `${props.threadInput.value ? `${props.threadInput.value}\n\n[User]` : "[User]"}\n${message}\n\n[Assistant]\n`)
+        ),
+        map(() => props.threadInput.value ?? ""),
+        debounceTime(200),
+        distinctUntilChanged(),
+        switchMap(async (prompt) => {
+          if (!prompt.trim()) return [];
+
+          this.ac?.abort(); // Abort previous request if any
+          this.ac = new AbortController();
+          const openai = new OpenAI({
+            dangerouslyAllowBrowser: true,
+            apiKey: props.apiKey.getApiKey(),
+          });
+
+          render(null, props.optionContainer); // Clear previous options
+
+          const response = await openai.completions.create(
+            {
+              model: "gpt-3.5-turbo-instruct",
+              prompt,
+              max_tokens: 32,
+              temperature: 0,
+              logprobs: 5,
+              stop: ["[User]"],
+            },
+            { signal: this.ac.signal }
+          );
+
+          console.log("Response:", response);
+
+          const options = response.choices[0].logprobs?.top_logprobs ?? [];
+          const tokenStream = options.map((option) =>
+            Object.entries(option).map(([key, value]) => ({
+              token: key.startsWith("bytes:") ? decodeBytes(key) : key,
+              probability: value,
+            }))
+          );
+          return tokenStream;
+        }),
+        switchMap((tokenStream) => from(tokenStream)),
+        concatMap(async (options) => {
+          render(
+            html`
+              ${options.map((o) => {
+                const { background, text } = probToHex(o.probability);
+                return html`<button class="token-option" style="background-color: ${background}; color: ${text};">
+                  <code>${JSON.stringify(o.token).slice(1, -1)}</code>
+                </button>`;
+              })}
+            `,
+            props.optionContainer
+          );
+
+          await new Promise((resolve) => setTimeout(resolve, 100)); // Simulate delay for next token
+          props.threadInput.value += options[0].token; // Append the first token to the input
+        })
+      )
+      .subscribe();
+  }
+}
