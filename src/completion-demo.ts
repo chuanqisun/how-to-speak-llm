@@ -1,6 +1,6 @@
 import { html, render } from "lit-html";
 import OpenAI from "openai";
-import { concatMap, debounceTime, distinctUntilChanged, filter, from, fromEvent, map, merge, mergeWith, Subject, switchMap, tap } from "rxjs";
+import { concatMap, debounceTime, distinctUntilChanged, EMPTY, filter, from, fromEvent, map, merge, mergeWith, Subject, switchMap, tap } from "rxjs";
 import type { ApiKey } from "./api-key";
 import { probToHex } from "./prob-to-hex";
 
@@ -161,13 +161,41 @@ export class ChatDemo {
     apiKey: ApiKey;
     allowEmoji?: boolean;
     stop?: string[];
+    delay?: number;
+    toolNameInput?: HTMLInputElement;
+    toolInputInput?: HTMLInputElement;
+    toolOutputInput?: HTMLInputElement;
+    simulateToolOutput?: boolean;
   }) {
     const submit$ = new Subject<string>();
 
+    const resumeAfterToolUse$ = new Subject<void>();
+
+    const simulateToolRun$ = new Subject<void>();
+
+    simulateToolRun$.pipe(tap(() => console.log("Simulating tool run..."))).subscribe();
+
     const forceSubmit$ = fromEvent<KeyboardEvent>(props.threadInput, "keydown").pipe(
       filter((e) => e.key === "Enter" && (e.ctrlKey || e.metaKey)),
+      mergeWith(resumeAfterToolUse$),
       map(() => props.threadInput.value)
     );
+
+    const toolOutputSubmit$ = props.toolOutputInput
+      ? fromEvent<KeyboardEvent>(props.toolOutputInput, "keydown").pipe(
+          filter((e) => e.key === "Enter" && (e.ctrlKey || e.metaKey)),
+          map(() => props.toolOutputInput!.value),
+          filter((output) => output.trim() !== ""),
+          tap((output) => {
+            props.threadInput.value = `${props.threadInput.value.trim()}\ntool_output: ${output.trim()}\nobservation: `;
+            props.toolNameInput!.value = "";
+            props.toolInputInput!.value = "";
+            props.toolOutputInput!.value = "";
+          })
+        )
+      : EMPTY;
+
+    toolOutputSubmit$.subscribe();
 
     props.messageInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
@@ -264,13 +292,32 @@ export class ChatDemo {
             props.optionContainer
           );
 
-          await new Promise((resolve) => setTimeout(resolve, 100)); // Simulate delay for next token
+          await new Promise((resolve) => setTimeout(resolve, props.delay ?? 100)); // Simulate delay for next token
           const selectedToken = options.find((o) => o.isSelected)!;
           const currentType = selectedToken.type as "text" | "bytes";
           if (inputState.parts.at(-1)?.type === currentType) {
             inputState.parts.at(-1)!.value += selectedToken.value; // Append to last part
           } else {
             inputState.parts.push({ type: currentType, value: selectedToken.value }); // Start new part
+          }
+
+          // match pattern to get tool function call: functionName(args)
+          const fnMatch = inputState.parts
+            .map((part) => part.value.match(/\w+\(.*\)/))
+            .filter(Boolean)
+            .at(-1);
+
+          if (props.toolInputInput && props.toolNameInput) {
+            const fnName = fnMatch ? fnMatch[0].split("(")[0] : null;
+            const fnArgs = fnMatch ? fnMatch[0].slice(fnName!.length + 1, -1) : null;
+            if (fnName && fnArgs) {
+              props.toolNameInput.value = fnName;
+              props.toolInputInput.value = fnArgs;
+
+              if (props.simulateToolOutput) {
+                simulateToolRun$.next();
+              }
+            }
           }
 
           if (props.allowEmoji) {

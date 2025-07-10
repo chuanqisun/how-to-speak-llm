@@ -114,17 +114,102 @@ final response: ...
           <div id="reActOutput" class="option-list"></div>
         </div>
         <div class="details">
-          <label for="toolIutput">Tool input</label>
-          <textarea id="toolIutput" name="toolIutput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
+          <label for="reActToolName">Tool name</label>
+          <textarea
+            id="reActToolName"
+            placeholder="Scanning for tool_name..."
+            name="reActToolName"
+            type="text"
+            class="block-input"
+            autocomplete="off"
+            spellcheck="false"
+          ></textarea>
 
-          <label for="toolOutput">Tool output</label>
-          <textarea id="toolOutput" name="toolOutput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
+          <label for="reActToolInput">Tool input</label>
+          <textarea
+            id="reActToolInput"
+            placeholder="Scanning for tool_input..."
+            name="reActToolInput"
+            type="text"
+            class="block-input"
+            autocomplete="off"
+            spellcheck="false"
+          ></textarea>
+
+          <label for="reActToolOutput">Tool output</label>
+          <textarea id="reActToolOutput" name="reActToolOutput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
         </div>
       </div>
     </details>
 
     <details>
-      <summary>6. Tools in a loop</summary>
+      <summary>6. Tools automated</summary>
+      <div class="two-columns">
+        <div class="details">
+          <label for="agentMessageInput">User message</label>
+          <textarea id="agentMessageInput" name="agentMessageInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
+          <br />
+          <label for="agentInput">Thread</label>
+          <textarea id="agentInput" name="agentInput" type="text" class="block-input" autocomplete="off" spellcheck="false">
+Below is a transcript of user interacting with an Assistant. The assistant reasons about its plan, uses tool to interact with the environment, makes observation about tools output
+After sufficient tool use, the assisant provides a final response. The assistant can only use the following tools:
+
+get_weather("city") - returns the weather in the given city
+web_search("query") - returns the top 3 search results for the given query
+
+
+The transcript format:
+
+"""
+[User]
+...
+
+[Assistant]
+thought: ...
+tool_use: tool_name("args")
+tool_output: ...
+observation: ...
+
+thought: ...
+tool_use: tool_name("args")
+tool_output: ...
+observation: ...
+
+...
+
+final response: ...
+"""</textarea
+          >
+          <br />
+          <div id="agentOutput" class="option-list"></div>
+        </div>
+        <div class="details">
+          <label for="agentToolName">Tool name</label>
+          <textarea
+            id="agentToolName"
+            placeholder="Scanning for tool_name..."
+            name="agentToolName"
+            type="text"
+            class="block-input"
+            autocomplete="off"
+            spellcheck="false"
+          ></textarea>
+
+          <label for="agentToolInput">Tool input</label>
+          <textarea
+            id="agentToolInput"
+            placeholder="Scanning for tool_input..."
+            name="agentToolInput"
+            type="text"
+            class="block-input"
+            autocomplete="off"
+            spellcheck="false"
+          ></textarea>
+
+          <label for="agentToolOutput">Tool output</label>
+          <textarea id="agentToolOutput" name="agentToolOutput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
+        </div>
+      </div>
     </details>
 
     <script type="module" src="/src/main.ts"></script>

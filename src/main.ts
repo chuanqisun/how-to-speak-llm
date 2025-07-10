@@ -37,6 +37,23 @@ new ChatDemo({
   threadInput: document.querySelector("#reActInput") as HTMLInputElement,
   messageInput: document.querySelector("#reActMessageInput") as HTMLInputElement,
   optionContainer: document.querySelector("#reActOutput") as HTMLElement,
+  toolNameInput: document.querySelector("#reActToolName") as HTMLInputElement,
+  toolInputInput: document.querySelector("#reActToolInput") as HTMLInputElement,
+  toolOutputInput: document.querySelector("#reActToolOutput") as HTMLInputElement,
   apiKey,
+  delay: 50,
+  stop: ["[User]", "tool_output"],
+});
+
+new ChatDemo({
+  threadInput: document.querySelector("#agentInput") as HTMLInputElement,
+  messageInput: document.querySelector("#agentMessageInput") as HTMLInputElement,
+  optionContainer: document.querySelector("#agentOutput") as HTMLElement,
+  toolNameInput: document.querySelector("#agentToolName") as HTMLInputElement,
+  toolInputInput: document.querySelector("#agentToolInput") as HTMLInputElement,
+  toolOutputInput: document.querySelector("#agentToolOutput") as HTMLInputElement,
+  apiKey,
+  delay: 50,
+  simulateToolOutput: true,
   stop: ["[User]", "tool_output"],
 });
