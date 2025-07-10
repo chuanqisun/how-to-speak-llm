@@ -13,12 +13,22 @@ input::-ms-clear {
   display: none;
 }
 
+summary {
+  cursor: pointer;
+  user-select: none;
+  padding: 0.5ch;
+  &:hover {
+    color: white;
+    background-color: black;
+  }
+}
+
 .inline-input {
   padding: 1ch;
   outline: none;
   border: none;
   field-sizing: content;
-  max-width: 40ch;
+  width: 100%;
   background-color: #eee;
 }
 
