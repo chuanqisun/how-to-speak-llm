@@ -8,6 +8,10 @@
   font-size: inherit;
 }
 
+body {
+  display: grid;
+}
+
 input::-ms-reveal,
 input::-ms-clear {
   display: none;
@@ -16,7 +20,7 @@ input::-ms-clear {
 summary {
   cursor: pointer;
   user-select: none;
-  padding: 0.5ch;
+  padding: 1ch;
   &:hover {
     color: white;
     background-color: black;
@@ -64,7 +68,7 @@ label {
 
 .details {
   border: 4px double black;
-  margin-top: 1ch;
+  margin-block: 0.5ch 1.5ch;
   padding: 1ch;
   /* padding: 1ch 0 1ch calc(1ch + 0.4rem); */
 }

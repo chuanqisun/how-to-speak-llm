@@ -15,8 +15,6 @@
       </div>
     </details>
 
-    <br />
-
     <details>
       <summary>1. Next token</summary>
       <div class="details">
@@ -25,8 +23,6 @@
         <div id="completionOutput" class="option-list"></div>
       </div>
     </details>
-
-    <br />
 
     <details>
       <summary>2. Next token in a loop</summary>
@@ -37,8 +33,6 @@
         <div id="multitokenOutput" class="option-list"></div>
       </div>
     </details>
-
-    <br />
 
     <details>
       <summary>3. Chat</summary>
@@ -51,8 +45,6 @@
         <div id="threadOutput" class="option-list"></div>
       </div>
     </details>
-
-    <br />
 
     <details>
       <summary>4. Chain of Thought</summary>
@@ -80,8 +72,6 @@ final response: ...
       </div>
     </details>
 
-    <br />
-
     <details>
       <summary>5. Tools</summary>
       <div class="two-columns">
@@ -94,8 +84,8 @@ final response: ...
 Below is a transcript of user interacting with an Assistant. The assistant reasons about its plan, uses tool to interact with the environment, makes observation about tools output
 After sufficient tool use, the assisant provides a final response. The assistant can only use the following tools:
 
-"get_weather(city)" - returns the weather in the given city
-"web_search(query)" - returns the top 3 search results for the given query
+get_weather("city") - returns the weather in the given city
+web_search("query") - returns the top 3 search results for the given query
 
 
 The transcript format:
@@ -106,12 +96,12 @@ The transcript format:
 
 [Assistant]
 thought: ...
-tool_use: tool_name(args)
+tool_use: tool_name("args")
 tool_output: ...
 observation: ...
 
 thought: ...
-tool_use: tool_name(args)
+tool_use: tool_name("args")
 tool_output: ...
 observation: ...
 
@@ -132,8 +122,6 @@ final response: ...
         </div>
       </div>
     </details>
-
-    <br />
 
     <details>
       <summary>6. Tools in a loop</summary>
