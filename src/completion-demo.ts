@@ -179,6 +179,16 @@ export class ChatDemo {
       }
     });
 
+    const messageCancel$ = fromEvent<KeyboardEvent>(props.messageInput, "keydown").pipe(filter((e) => e.key === "Escape"));
+    const threadCancel$ = fromEvent<KeyboardEvent>(props.threadInput, "keydown").pipe(filter((e) => e.key === "Escape"));
+    merge(messageCancel$, threadCancel$)
+      .pipe(
+        tap(() => {
+          this.ac?.abort(); // Abort any ongoing request
+        })
+      )
+      .subscribe();
+
     const inputState = {
       initial: "",
       parts: [] as { type: "text" | "bytes"; value: string }[],
@@ -269,6 +279,8 @@ export class ChatDemo {
           } else {
             props.threadInput.value += selectedToken.value;
           }
+
+          this.ac = undefined; // Clear abort controller after request
         })
       )
       .subscribe();

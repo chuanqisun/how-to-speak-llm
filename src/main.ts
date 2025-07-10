@@ -21,6 +21,7 @@ new ChatDemo({
   messageInput: document.querySelector("#messageInput") as HTMLInputElement,
   optionContainer: document.querySelector("#threadOutput") as HTMLElement,
   apiKey,
+  allowEmoji: true,
   stop: ["[User]"],
 });
 
