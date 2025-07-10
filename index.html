@@ -24,7 +24,7 @@
     <br />
 
     <details>
-      <summary>2. Completion</summary>
+      <summary>2. Next token in a loop</summary>
       <div class="details">
         <label for="multitokenInput">Input</label>
         <textarea id="multitokenInput" name="multitokenInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
@@ -78,13 +78,14 @@ final response: ...
     <br />
 
     <details>
-      <summary>5. Agent</summary>
-      <div class="details">
-        <label for="reActMessageInput">User message</label>
-        <textarea id="reActMessageInput" name="reActMessageInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
-        <br />
-        <label for="reActInput">Thread</label>
-        <textarea id="reActInput" name="reActInput" type="text" class="block-input" autocomplete="off" spellcheck="false">
+      <summary>5. Tools</summary>
+      <div class="two-columns">
+        <div class="details">
+          <label for="reActMessageInput">User message</label>
+          <textarea id="reActMessageInput" name="reActMessageInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
+          <br />
+          <label for="reActInput">Thread</label>
+          <textarea id="reActInput" name="reActInput" type="text" class="block-input" autocomplete="off" spellcheck="false">
 Below is a transcript of user interacting with an Assistant. The assistant reasons about its plan, uses tool to interact with the environment, makes observation about tools output
 After sufficient tool use, the assisant provides a final response. The assistant can only use the following tools:
 
@@ -113,11 +114,26 @@ observation: ...
 
 final response: ...
 """</textarea
-        >
-        <br />
-        <div id="reActOutput" class="option-list"></div>
+          >
+          <br />
+          <div id="reActOutput" class="option-list"></div>
+        </div>
+        <div class="details">
+          <label for="toolIutput">Tool input</label>
+          <textarea id="toolIutput" name="toolIutput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
+
+          <label for="toolOutput">Tool output</label>
+          <textarea id="toolOutput" name="toolOutput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
+        </div>
       </div>
     </details>
+
+    <br />
+
+    <details>
+      <summary>6. Tools in a loop</summary>
+    </details>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

@@ -43,6 +43,7 @@ input::-ms-clear {
 
 label {
   display: block;
+  margin-bottom: 0.5ch;
 }
 
 .option-list {
@@ -56,4 +57,10 @@ label {
   margin-top: 1ch;
   padding: 1ch;
   /* padding: 1ch 0 1ch calc(1ch + 0.4rem); */
+}
+
+.two-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1ch;
 }
