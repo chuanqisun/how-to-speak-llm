@@ -173,7 +173,18 @@ export class ChatDemo {
 
     const simulateToolRun$ = new Subject<void>();
 
-    simulateToolRun$.pipe(tap(() => console.log("Simulating tool run..."))).subscribe();
+    simulateToolRun$
+      .pipe(
+        switchMap(() => {
+          const openai = new OpenAI({
+            dangerouslyAllowBrowser: true,
+            apiKey: props.apiKey.getApiKey(),
+          });
+
+          return from(openai.responses.create({}));
+        })
+      )
+      .subscribe();
 
     const forceSubmit$ = fromEvent<KeyboardEvent>(props.threadInput, "keydown").pipe(
       filter((e) => e.key === "Enter" && (e.ctrlKey || e.metaKey)),
