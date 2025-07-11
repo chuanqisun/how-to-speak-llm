@@ -37,21 +37,18 @@
     <details>
       <summary>3. Chat</summary>
       <div class="details">
-        <label for="messageInput">User message</label>
-        <textarea id="messageInput" name="messageInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
         <label for="threadInput">Thread</label>
         <textarea id="threadInput" name="threadInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
-        <br />
         <div id="threadOutput" class="option-list"></div>
+        <br />
+        <label for="messageInput">User message</label>
+        <textarea id="messageInput" name="messageInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
       </div>
     </details>
 
     <details>
       <summary>4. Chain of Thought</summary>
       <div class="details">
-        <label for="cotMessageInput">User message</label>
-        <textarea id="cotMessageInput" name="cotMessageInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
-        <br />
         <label for="cotInput">Thread</label>
         <textarea id="cotInput" name="cotInput" type="text" class="block-input">
 Below is a transcript of user interacting with an Assistant. The assistant responded with its internal monologue thinking and final response in one turn. In this format
@@ -67,8 +64,10 @@ thought: ...
 final response: ...
 """</textarea
         >
-        <br />
         <div id="cotOutput" class="option-list"></div>
+        <br />
+        <label for="cotMessageInput">User message</label>
+        <textarea id="cotMessageInput" name="cotMessageInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
       </div>
     </details>
 
@@ -76,42 +75,57 @@ final response: ...
       <summary>5. Tools</summary>
       <div class="two-columns">
         <div class="details">
-          <label for="reActMessageInput">User message</label>
-          <textarea id="reActMessageInput" name="reActMessageInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
-          <br />
           <label for="reActInput">Thread</label>
           <textarea id="reActInput" name="reActInput" type="text" class="block-input" autocomplete="off" spellcheck="false">
-Below is a transcript of user interacting with an Assistant. The assistant reasons about its plan, uses tool to interact with the environment, makes observation about tools output
-After sufficient tool use, the assisant provides a final response. The assistant can only use the following tools:
+Below is a transcript of user interacting with an Assistant. The Assistant thinks step by step. In each turn, the assistant responds in one of the following formats:
 
-get_weather("city") - returns the weather in the given city
-web_search("query") - returns the top 3 search results for the given query
+Format 1: think and respond
+Use this format when you need to ask user a question or chat with user without using tools.
+"""
+[Assistant]
+thought: &lt;make plans on how to respond to the user&gt;
+response: &lt;the actual response to the user&gt;
+"""
 
+Format 2: think, use tool, observe, and respond
+Make sure you have obtained the correct info from the user with Format 1.
+"""
+[Assistant]
+thought: &lt;make plans on how to respond to the user&gt;
+tool_use: &lt;example_tool("example_args")&gt;
+tool_output: &lt;{ result: "example_output" }&gt;
+response: &lt;the actual response to the user&gt;
+"""
 
-The transcript format:
+In format 2, The assistant only has access to the following tools:
 
+lookup_product_info("&lt;keywords&gt;") - returns product info.
+lookup_shipping_info("&lt;order number obtained from the user&gt;") - returns the info about shipping.
+submit_order("&lt;product_id&gt;") - submits an order for the product with the given id.
+
+The full transcript will alternate between [User] and [Assistant] like this:
 """
 [User]
 ...
 
 [Assistant]
-thought: ...
-tool_use: tool_name("args")
-tool_output: ...
-observation: ...
-
-thought: ...
-tool_use: tool_name("args")
-tool_output: ...
-observation: ...
-
 ...
 
-final response: ...
-"""</textarea
+[User]
+...
+
+[Assistant]
+...
+"""
+
+Here is the full step-by-step transcript:
+"""
+</textarea
           >
-          <br />
           <div id="reActOutput" class="option-list"></div>
+          <br />
+          <label for="reActMessageInput">User message</label>
+          <textarea id="reActMessageInput" name="reActMessageInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
         </div>
         <div class="details">
           <label for="reActToolName">Tool name</label>
@@ -146,42 +160,56 @@ final response: ...
       <summary>6. Tools automated</summary>
       <div class="two-columns">
         <div class="details">
-          <label for="agentMessageInput">User message</label>
-          <textarea id="agentMessageInput" name="agentMessageInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
-          <br />
           <label for="agentInput">Thread</label>
           <textarea id="agentInput" name="agentInput" type="text" class="block-input" autocomplete="off" spellcheck="false">
-Below is a transcript of user interacting with an Assistant. The assistant reasons about its plan, uses tool to interact with the environment, makes observation about tools output
-After sufficient tool use, the assisant provides a final response. The assistant can only use the following tools:
+Below is a transcript of user interacting with an Assistant. The Assistant thinks step by step. In each turn, the assistant responds in one of the following formats:
 
-get_weather("city") - returns the weather in the given city
-web_search("query") - returns the top 3 search results for the given query
+Format 1: think and respond
+Use this format when you need to ask user a question or chat with user without using tools.
+"""
+[Assistant]
+thought: &lt;make plans on how to respond to the user&gt;
+response: &lt;the actual response to the user&gt;
+"""
 
+Format 2: think, use tool, observe, and respond
+Make sure you have obtained the correct info from the user with Format 1.
+"""
+[Assistant]
+thought: &lt;make plans on how to respond to the user&gt;
+tool_use: &lt;example_tool("example_args")&gt;
+tool_output: &lt;{ result: "example_output" }&gt;
+response: &lt;the actual response to the user&gt;
+"""
 
-The transcript format:
+In format 2, The assistant only has access to the following tools:
+lookup_product_info("&lt;keywords&gt;") - returns product info.
+lookup_shipping_info("&lt;order number obtained from the user&gt;") - returns the info about shipping.
+submit_order("&lt;product_id&gt;") - submits an order for the product with the given id.
 
+The full transcript will alternate between [User] and [Assistant] like this:
 """
 [User]
 ...
 
 [Assistant]
-thought: ...
-tool_use: tool_name("args")
-tool_output: ...
-observation: ...
-
-thought: ...
-tool_use: tool_name("args")
-tool_output: ...
-observation: ...
-
 ...
 
-final response: ...
-"""</textarea
+[User]
+...
+
+[Assistant]
+...
+"""
+
+Here is the full step-by-step transcript:
+"""
+</textarea
           >
-          <br />
           <div id="agentOutput" class="option-list"></div>
+          <br />
+          <label for="agentMessageInput">User message</label>
+          <textarea id="agentMessageInput" name="agentMessageInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
         </div>
         <div class="details">
           <label for="agentToolName">Tool name</label>

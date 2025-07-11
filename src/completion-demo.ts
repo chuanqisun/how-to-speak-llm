@@ -2,7 +2,9 @@ import { html, render } from "lit-html";
 import OpenAI from "openai";
 import { concatMap, debounceTime, distinctUntilChanged, EMPTY, filter, from, fromEvent, map, merge, mergeWith, Subject, switchMap, tap } from "rxjs";
 import type { ApiKey } from "./api-key";
+import { decodeBytes } from "./decode-bytes";
 import { probToHex } from "./prob-to-hex";
+import { scrollToBottom } from "./scroll";
 
 export class CompletionDemo {
   private ac?: AbortController;
@@ -181,7 +183,42 @@ export class ChatDemo {
             apiKey: props.apiKey.getApiKey(),
           });
 
-          return from(openai.responses.create({}));
+          const toolName = props.toolNameInput!.value.trim();
+          const toolInput = props.toolInputInput!.value.trim();
+
+          return from(
+            openai.responses
+              .create({
+                model: "gpt-4.1-mini",
+                temperature: 0,
+                input: [
+                  {
+                    role: "developer",
+                    content:
+                      `You are simulating a function calling of some backend API. Respond with a realistic output in valid JSON. Keep the response small and avoid returning verbose metadata.`.trim(),
+                  },
+                  {
+                    role: "assistant",
+                    content: `
+Function name: "${toolName}"
+Input: ${toolInput}.`.trim(),
+                  },
+                ],
+                text: {
+                  format: {
+                    type: "json_object",
+                  },
+                },
+              })
+              .then((r) => JSON.stringify(JSON.parse(r.output_text)))
+              .catch(() => "Error running tool")
+          );
+        }),
+        tap((output) => {
+          props.toolOutputInput!.value = output;
+          props.threadInput.value = `${props.threadInput.value.trim()}\ntool_output: ${output.trim()}\nobservation: `;
+          scrollToBottom(props.threadInput);
+          resumeAfterToolUse$.next(); // Resume after tool use
         })
       )
       .subscribe();
@@ -202,6 +239,7 @@ export class ChatDemo {
             props.toolNameInput!.value = "";
             props.toolInputInput!.value = "";
             props.toolOutputInput!.value = "";
+            scrollToBottom(props.threadInput);
           })
         )
       : EMPTY;
@@ -241,9 +279,10 @@ export class ChatDemo {
 
     merge(submit$)
       .pipe(
-        tap(
-          (message) => (props.threadInput.value = `${props.threadInput.value ? `${props.threadInput.value}\n\n[User]` : "[User]"}\n${message}\n\n[Assistant]\n`)
-        ),
+        tap((message) => {
+          props.threadInput.value = `${props.threadInput.value ? `${props.threadInput.value.trim()}\n\n[User]` : "[User]"}\n${message}\n\n[Assistant]\n`;
+          scrollToBottom(props.threadInput, { force: true });
+        }),
         map(() => props.threadInput.value ?? ""),
         debounceTime(200),
         distinctUntilChanged(),
@@ -267,7 +306,7 @@ export class ChatDemo {
             {
               model: "gpt-3.5-turbo-instruct",
               prompt,
-              max_tokens: 120,
+              max_tokens: 1000,
               temperature: 0,
               logprobs: 5,
               stop: props.stop,
@@ -338,35 +377,11 @@ export class ChatDemo {
             props.threadInput.value += selectedToken.value;
           }
 
+          scrollToBottom(props.threadInput);
+
           this.ac = undefined; // Clear abort controller after request
         })
       )
       .subscribe();
-  }
-}
-
-function decodeBytes(input: string) {
-  try {
-    // Remove "bytes:" prefix
-    const hexString = input.replace(/^bytes:/, "");
-
-    // Extract ALL hex bytes in sequence
-    const hexMatches = hexString.match(/\\x([0-9a-fA-F]{2})/g);
-
-    if (!hexMatches || hexMatches.length === 0) {
-      return input;
-    }
-
-    // Convert all hex values to bytes
-    const bytes = hexMatches.map((hex) => parseInt(hex.replace("\\x", ""), 16));
-
-    // Let TextDecoder handle the variable-length UTF-8 sequences
-    const byteArray = new Uint8Array(bytes);
-    const decoder = new TextDecoder("utf-8", { fatal: false });
-
-    return decoder.decode(byteArray);
-  } catch (error) {
-    console.error("Error converting bytes to Unicode:", error);
-    return input;
   }
 }

@@ -78,3 +78,9 @@ label {
   grid-template-columns: 1fr 1fr;
   gap: 1ch;
 }
+
+textarea {
+  word-break: break-word;
+  max-height: 60vh;
+  overflow: auto;
+}
