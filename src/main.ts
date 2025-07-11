@@ -57,3 +57,11 @@ new ChatDemo({
   simulateToolOutput: true,
   stop: ["[User]", "tool_output"],
 });
+
+document.querySelectorAll<HTMLElement>(".hint-button").forEach((button) => {
+  button.addEventListener("click", () => {
+    const willReveal = button.textContent === "Hint";
+    button.innerHTML = willReveal ? button.getAttribute("data-hint")! : "Hint";
+    button.toggleAttribute("data-revealed", willReveal);
+  });
+});

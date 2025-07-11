@@ -6,10 +6,15 @@
 * {
   box-sizing: border-box;
   font-size: inherit;
+  font-family: inherit;
 }
 
 body {
   display: grid;
+}
+
+button {
+  cursor: pointer;
 }
 
 input::-ms-reveal,
@@ -24,6 +29,37 @@ summary {
   &:hover {
     color: white;
     background-color: black;
+  }
+}
+
+.hint-button {
+  margin-top: 1ch;
+  background: none;
+  padding: 0;
+  border: none;
+  display: inline-flex;
+  opacity: 0.5;
+  align-items: center;
+  text-wrap: balance;
+  white-space: pre-wrap;
+  flex-wrap: wrap;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &[data-revealed] {
+    opacity: 1;
+  }
+
+  &&::before {
+    white-space: pre-wrap;
+    content: "[ ";
+  }
+
+  &&::after {
+    white-space: pre-wrap;
+    content: " ]";
   }
 }
 

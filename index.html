@@ -20,8 +20,17 @@
       <summary>1. Next token</summary>
       <div class="details">
         <label for="completionInput">Input</label>
-        <textarea id="completionInput" name="nextTokenInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
+        <textarea
+          id="completionInput"
+          placeholder="Next token appears as you type..."
+          name="nextTokenInput"
+          type="text"
+          class="block-input"
+          autocomplete="off"
+          spellcheck="false"
+        ></textarea>
         <div id="completionOutput" class="option-list"></div>
+        <button class="hint-button" data-hint="Meaning is from every decision we make" data-hidden>Hint</button>
       </div>
     </details>
 
@@ -29,9 +38,18 @@
       <summary>2. Next token in a loop</summary>
       <div class="details">
         <label for="multitokenInput">Input</label>
-        <textarea id="multitokenInput" name="multitokenInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
+        <textarea
+          id="multitokenInput"
+          placeholder="Ctrl/Cmd + Enter to submit"
+          name="multitokenInput"
+          type="text"
+          class="block-input"
+          autocomplete="off"
+          spellcheck="false"
+        ></textarea>
         <br />
         <div id="multitokenOutput" class="option-list"></div>
+        <button class="hint-button" data-hint="Routine eliminates unnecessary decisions" data-hidden>Hint</button>
       </div>
     </details>
 
@@ -43,7 +61,16 @@
         <div id="threadOutput" class="option-list"></div>
         <br />
         <label for="messageInput">User message</label>
-        <textarea id="messageInput" name="messageInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
+        <textarea
+          id="messageInput"
+          placeholder="Ctrl/Cmd + Enter to submit"
+          name="messageInput"
+          type="text"
+          class="block-input"
+          autocomplete="off"
+          spellcheck="false"
+        ></textarea>
+        <button class="hint-button" data-hint="Empathy begins where the monologue ends" data-hidden>Hint</button>
       </div>
     </details>
 
@@ -68,7 +95,16 @@ final response: ...
         <div id="cotOutput" class="option-list"></div>
         <br />
         <label for="cotMessageInput">User message</label>
-        <textarea id="cotMessageInput" name="cotMessageInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
+        <textarea
+          id="cotMessageInput"
+          placeholder="Ctrl/Cmd + Enter to submit"
+          name="cotMessageInput"
+          type="text"
+          class="block-input"
+          autocomplete="off"
+          spellcheck="false"
+        ></textarea>
+        <button class="hint-button" data-hint="Everybody needs some time on think alone" data-hidden>Hint</button>
       </div>
     </details>
 
@@ -95,6 +131,7 @@ Make sure you have obtained the correct info from the user with Format 1.
 thought: &lt;make plans on how to respond to the user&gt;
 tool_use: &lt;example_tool("example_args")&gt;
 tool_output: &lt;{ result: "example_output" }&gt;
+observation: &lt;observation based the tool output&gt;
 response: &lt;the actual response to the user&gt;
 """
 
@@ -127,6 +164,8 @@ Here is the full step-by-step transcript:
           <br />
           <label for="reActMessageInput">User message</label>
           <textarea id="reActMessageInput" name="reActMessageInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
+
+          <button class="hint-button" data-hint="Doing is thinking" data-hidden>Hint</button>
         </div>
         <div class="details">
           <label for="reActToolName">Tool name</label>
@@ -152,7 +191,15 @@ Here is the full step-by-step transcript:
           ></textarea>
 
           <label for="reActToolOutput">Tool output</label>
-          <textarea id="reActToolOutput" name="reActToolOutput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
+          <textarea
+            id="reActToolOutput"
+            placeholder="Ctrl/Cmd + Enter to submit"
+            name="reActToolOutput"
+            type="text"
+            class="block-input"
+            autocomplete="off"
+            spellcheck="false"
+          ></textarea>
         </div>
       </div>
     </details>
@@ -180,6 +227,7 @@ Make sure you have obtained the correct info from the user with Format 1.
 thought: &lt;make plans on how to respond to the user&gt;
 tool_use: &lt;example_tool("example_args")&gt;
 tool_output: &lt;{ result: "example_output" }&gt;
+observation: &lt;observation based the tool output&gt;
 response: &lt;the actual response to the user&gt;
 """
 
@@ -211,6 +259,7 @@ Here is the full step-by-step transcript:
           <br />
           <label for="agentMessageInput">User message</label>
           <textarea id="agentMessageInput" name="agentMessageInput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
+          <button class="hint-button" data-hint="Meaning is every <s>decision</s> action we <s>make</s> take" data-hidden>Hint</button>
         </div>
         <div class="details">
           <label for="agentToolName">Tool name</label>
@@ -236,7 +285,15 @@ Here is the full step-by-step transcript:
           ></textarea>
 
           <label for="agentToolOutput">Tool output</label>
-          <textarea id="agentToolOutput" name="agentToolOutput" type="text" class="block-input" autocomplete="off" spellcheck="false"></textarea>
+          <textarea
+            id="agentToolOutput"
+            placeholder="Ctrl/Cmd + Enter to submit"
+            name="agentToolOutput"
+            type="text"
+            class="block-input"
+            autocomplete="off"
+            spellcheck="false"
+          ></textarea>
         </div>
       </div>
     </details>
